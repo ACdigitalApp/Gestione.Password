@@ -39,6 +39,9 @@ export const InstallPWA = () => {
       setDeferredPrompt(null);
     } else if (isIOS) {
       setShowIOSGuide(true);
+    } else {
+      // Fallback: show generic instructions for browsers that don't support beforeinstallprompt
+      toast.info("Per installare l'app: apri il menu del browser (⋮) e seleziona 'Installa app' o 'Aggiungi alla schermata Home'.");
     }
   };
 
