@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Download, X, Share, Plus as PlusIcon } from "lucide-react";
+import { toast } from "sonner";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -39,6 +40,9 @@ export const InstallPWA = () => {
       setDeferredPrompt(null);
     } else if (isIOS) {
       setShowIOSGuide(true);
+    } else {
+      // Fallback: show generic instructions for browsers that don't support beforeinstallprompt
+      toast.info("Per installare l'app: apri il menu del browser (⋮) e seleziona 'Installa app' o 'Aggiungi alla schermata Home'.");
     }
   };
 
