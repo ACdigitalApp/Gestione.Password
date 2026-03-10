@@ -110,6 +110,7 @@ const Index = () => {
           </div>
 
           <div className="flex items-center gap-3">
+            <InstallPWA />
             <span className="text-xs text-slate-500 hidden sm:block">{user?.email}</span>
             <button
               onClick={signOut}
