@@ -48,9 +48,9 @@ export const InstallPWA = () => {
     <>
       <button
         onClick={handleInstall}
-        className="inline-flex items-center gap-1.5 text-indigo-400 hover:text-indigo-300 text-sm font-semibold transition-colors"
+        className="inline-flex items-center gap-1.5 h-8 rounded-md px-3 text-xs text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 font-medium transition-colors"
       >
-        <Download className="w-4 h-4" />
+        <Download className="w-4 h-4 mr-1.5" />
         Scarica App
       </button>
 
