@@ -2,12 +2,10 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { PasswordDialog } from "@/components/PasswordDialog";
 import { PasswordRow } from "@/components/PasswordRow";
 import { toast } from "sonner";
-import { Plus, Search, LogOut, Key } from "lucide-react";
+import { Plus, Search, LogOut, Shield, Key } from "lucide-react";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Password = Tables<"passwords">;
@@ -84,8 +82,8 @@ const Index = () => {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <p className="font-mono text-muted-foreground">CARICAMENTO...</p>
+      <div className="min-h-screen flex items-center justify-center bg-[#090D0F]">
+        <p className="text-slate-400 text-sm">Caricamento...</p>
       </div>
     );
   }
@@ -99,117 +97,101 @@ const Index = () => {
   );
 
   return (
-    <div className="flex min-h-screen">
-      {/* Sidebar */}
-      <aside className="hidden md:flex md:w-64 bg-secondary flex-col border-r-2 border-border">
-        <div className="p-5">
-          <div className="flex items-center gap-2">
-            <Key className="h-5 w-5 text-primary" strokeWidth={1.5} />
-            <h1 className="font-mono text-lg font-bold text-secondary-foreground tracking-tight">
-              EMERGENT
-            </h1>
-          </div>
-          <div className="mt-2 h-[2px] w-10 bg-primary" />
-        </div>
-
-        <div className="flex-1" />
-
-        <div className="p-5 border-t-2 border-sidebar-border">
-          <p className="font-mono text-xs text-secondary-foreground/60 truncate mb-3">
-            {user?.email}
-          </p>
-          <button
-            onClick={signOut}
-            className="flex items-center gap-2 font-mono text-xs text-secondary-foreground/60 hover:text-primary transition-colors"
-          >
-            <LogOut className="h-3.5 w-3.5" strokeWidth={1.5} />
-            ESCI
-          </button>
-        </div>
-      </aside>
-
-      {/* Main content */}
-      <main className="flex-1 flex flex-col bg-background">
-        {/* Mobile header */}
-        <div className="md:hidden flex items-center justify-between p-4 border-b-2 border-border bg-secondary">
-          <div className="flex items-center gap-2">
-            <Key className="h-4 w-4 text-primary" strokeWidth={1.5} />
-            <span className="font-mono text-sm font-bold text-secondary-foreground">EMERGENT</span>
-          </div>
-          <button
-            onClick={signOut}
-            className="text-secondary-foreground/60 hover:text-primary transition-colors"
-          >
-            <LogOut className="h-4 w-4" strokeWidth={1.5} />
-          </button>
-        </div>
-
-        {/* Toolbar */}
-        <div className="border-b-2 border-border p-4">
+    <div className="min-h-screen bg-[#090D0F]">
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-[#090D0F]/80 backdrop-blur-xl border-b border-white/[0.06]">
+        <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" strokeWidth={1.5} />
-              <Input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Cerca..."
-                className="pl-10 font-mono text-sm border-2 border-border focus:border-primary"
-              />
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+              <Shield className="w-4 h-4 text-white" />
             </div>
-            <Button
-              onClick={() => {
-                setEditingPassword(null);
-                setDialogOpen(true);
-              }}
-              className="font-mono text-xs uppercase tracking-wider bg-primary text-primary-foreground hover:bg-primary/90 h-10 gap-1.5"
+            <h1 className="text-lg font-bold text-slate-100">Vault</h1>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-slate-500 hidden sm:block">{user?.email}</span>
+            <button
+              onClick={signOut}
+              className="p-2 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-white/[0.06] transition-all"
+              title="Esci"
             >
-              <Plus className="h-4 w-4" strokeWidth={1.5} />
-              <span className="hidden sm:inline">AGGIUNGI</span>
-            </Button>
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
         </div>
+      </header>
+
+      {/* Content */}
+      <main className="max-w-4xl mx-auto px-6 py-8">
+        {/* Toolbar */}
+        <div className="flex items-center gap-3 mb-6">
+          <div className="relative flex-1">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Cerca password..."
+              className="w-full rounded-xl border px-3 py-1 pl-10 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-500 bg-white/[0.04] border-white/[0.08] text-slate-100 placeholder:text-slate-500 h-11"
+            />
+          </div>
+          <button
+            onClick={() => {
+              setEditingPassword(null);
+              setDialogOpen(true);
+            }}
+            className="inline-flex items-center gap-2 h-11 px-5 rounded-xl bg-gradient-to-r from-indigo-500 to-pink-500 hover:from-indigo-600 hover:to-pink-600 text-white font-semibold text-sm shadow-lg shadow-indigo-500/30 transition-all hover:-translate-y-0.5"
+          >
+            <Plus className="w-4 h-4" />
+            <span className="hidden sm:inline">Aggiungi</span>
+          </button>
+        </div>
+
+        {/* Password count */}
+        {!fetching && filtered.length > 0 && (
+          <p className="text-xs text-slate-500 mb-4 uppercase tracking-wider">
+            {filtered.length} {filtered.length === 1 ? "password" : "password"} salvat{filtered.length === 1 ? "a" : "e"}
+          </p>
+        )}
 
         {/* List */}
-        <div className="flex-1 overflow-y-auto">
-          {fetching ? (
-            <div className="flex items-center justify-center p-12">
-              <p className="font-mono text-sm text-muted-foreground">CARICAMENTO...</p>
+        {fetching ? (
+          <div className="flex items-center justify-center py-20">
+            <p className="text-sm text-slate-500">Caricamento...</p>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="w-16 h-16 rounded-2xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center mb-4">
+              <Key className="w-7 h-7 text-slate-600" />
             </div>
-          ) : filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center p-12">
-              <Key className="h-10 w-10 text-muted-foreground/30 mb-4" strokeWidth={1} />
-              <p className="font-mono text-sm text-muted-foreground">
-                {search ? "Nessun risultato" : "Nessuna password salvata"}
+            <p className="text-sm text-slate-400 mb-1">
+              {search ? "Nessun risultato trovato" : "Nessuna password salvata"}
+            </p>
+            {!search && (
+              <p className="text-xs text-slate-600">
+                Clicca "Aggiungi" per iniziare
               </p>
-              {!search && (
-                <p className="font-mono text-xs text-muted-foreground/60 mt-1">
-                  Clicca AGGIUNGI per iniziare
-                </p>
-              )}
-            </div>
-          ) : (
-            <div>
-              <div className="px-4 py-2 border-b border-border">
-                <span className="font-mono text-xs text-muted-foreground uppercase tracking-wider">
-                  {filtered.length} {filtered.length === 1 ? "voce" : "voci"}
-                </span>
-              </div>
-              {filtered.map((entry) => (
-                <PasswordRow
-                  key={entry.id}
-                  entry={entry}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {filtered.map((entry) => (
+              <PasswordRow
+                key={entry.id}
+                entry={entry}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
+            ))}
+          </div>
+        )}
       </main>
 
       <PasswordDialog
         open={dialogOpen}
-        onOpenChange={setDialogOpen}
+        onClose={() => {
+          setDialogOpen(false);
+          setEditingPassword(null);
+        }}
         onSave={handleSave}
         editingPassword={editingPassword}
       />

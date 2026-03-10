@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Eye, EyeOff, Pencil, Trash2, Copy, ExternalLink } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -17,15 +16,15 @@ export const PasswordRow = ({ entry, onEdit, onDelete }: PasswordRowProps) => {
 
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
-    toast.success(`${label} copiato`);
+    toast.success(`${label} copiato negli appunti`);
   };
 
   return (
-    <div className="border-b-2 border-border p-4 hover:bg-muted/50 transition-colors duration-100">
+    <div className="bg-white/[0.03] border border-white/[0.06] rounded-xl p-5 hover:bg-white/[0.06] transition-all duration-200 group">
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h3 className="font-mono text-sm font-semibold truncate">
+          <div className="flex items-center gap-2 mb-1">
+            <h3 className="text-base font-semibold text-slate-100 truncate">
               {entry.site_name}
             </h3>
             {entry.url && (
@@ -33,67 +32,63 @@ export const PasswordRow = ({ entry, onEdit, onDelete }: PasswordRowProps) => {
                 href={entry.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-muted-foreground hover:text-primary transition-colors"
+                className="text-slate-500 hover:text-indigo-400 transition-colors flex-shrink-0"
               >
-                <ExternalLink className="h-3.5 w-3.5" strokeWidth={1.5} />
+                <ExternalLink className="w-4 h-4" />
               </a>
             )}
           </div>
 
-          <div className="mt-1.5 flex items-center gap-2">
-            <span className="font-mono text-xs text-muted-foreground">{entry.username}</span>
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="text-sm text-slate-400">{entry.username}</span>
             <button
               onClick={() => copyToClipboard(entry.username, "Username")}
-              className="text-muted-foreground hover:text-primary transition-colors"
+              className="text-slate-600 hover:text-indigo-400 transition-colors opacity-0 group-hover:opacity-100"
             >
-              <Copy className="h-3 w-3" strokeWidth={1.5} />
+              <Copy className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          <div className="mt-1 flex items-center gap-2">
-            <span className="font-mono text-xs">
-              {showPassword ? entry.password_encrypted : "••••••••••"}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-slate-500 font-mono">
+              {showPassword ? entry.password_encrypted : "••••••••••••"}
             </span>
             <button
               onClick={() => setShowPassword(!showPassword)}
-              className="text-muted-foreground hover:text-primary transition-colors"
+              className="text-slate-600 hover:text-slate-300 transition-colors"
             >
               {showPassword ? (
-                <EyeOff className="h-3 w-3" strokeWidth={1.5} />
+                <EyeOff className="w-3.5 h-3.5" />
               ) : (
-                <Eye className="h-3 w-3" strokeWidth={1.5} />
+                <Eye className="w-3.5 h-3.5" />
               )}
             </button>
             <button
               onClick={() => copyToClipboard(entry.password_encrypted, "Password")}
-              className="text-muted-foreground hover:text-primary transition-colors"
+              className="text-slate-600 hover:text-indigo-400 transition-colors opacity-0 group-hover:opacity-100"
             >
-              <Copy className="h-3 w-3" strokeWidth={1.5} />
+              <Copy className="w-3.5 h-3.5" />
             </button>
           </div>
 
           {entry.notes && (
-            <p className="mt-1.5 text-xs text-muted-foreground truncate">{entry.notes}</p>
+            <p className="mt-2 text-xs text-slate-500 truncate">{entry.notes}</p>
           )}
         </div>
 
-        <div className="flex gap-1 shrink-0">
-          <Button
-            variant="ghost"
-            size="icon"
+        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
             onClick={() => onEdit(entry)}
-            className="h-8 w-8 text-muted-foreground hover:text-foreground hover:bg-muted"
+            className="p-2 rounded-lg text-slate-500 hover:text-slate-200 hover:bg-white/[0.06] transition-all"
           >
-            <Pencil className="h-3.5 w-3.5" strokeWidth={1.5} />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
+            <Pencil className="w-4 h-4" />
+          </button>
+          <button
             onClick={() => onDelete(entry.id)}
-            className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-muted"
+            className="p-2 rounded-lg text-slate-500 hover:text-red-400 hover:bg-white/[0.06] transition-all"
           >
-            <Trash2 className="h-3.5 w-3.5" strokeWidth={1.5} />
-          </Button>
+            <Trash2 className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </div>
