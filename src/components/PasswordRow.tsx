@@ -100,10 +100,14 @@ export const PasswordRow = ({ entry, onEdit, onDelete }: PasswordRowProps) => {
         {entry.category}
       </span>
 
-      {/* Extra info */}
-      {entry.extra_info && (
+      {/* Extra info or timestamp */}
+      {entry.extra_info ? (
         <span className="text-xs text-slate-500 truncate max-w-[150px] hidden lg:block">
           {entry.extra_info}
+        </span>
+      ) : (
+        <span className="text-xs text-slate-600 truncate max-w-[150px] hidden lg:block">
+          aggiornata al {new Date(entry.updated_at).toLocaleDateString("it-IT", { day: "2-digit", month: "2-digit" })}...
         </span>
       )}
 
