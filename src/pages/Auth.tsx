@@ -150,6 +150,11 @@ const Auth = () => {
             {isLogin ? "Prima volta? Registrati" : "Hai già un account? Accedi"}
           </button>
         </div>
+
+        {/* Install PWA */}
+        <div className="mt-4 text-center">
+          <InstallPWA />
+        </div>
       </div>
     </div>
   );
