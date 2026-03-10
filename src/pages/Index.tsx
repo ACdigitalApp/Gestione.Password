@@ -114,21 +114,32 @@ const Index = () => {
       if (!file) return;
       try {
         const text = await file.text();
-        const imported = JSON.parse(text) as Array<{
-          site_name: string;
-          username: string;
-          password_encrypted: string;
-          url?: string;
-          notes?: string;
-          category?: string;
-          extra_info?: string;
-        }>;
+        const parsed = JSON.parse(text);
+        // Support both formats: array directly or { passwords: [...] }
+        const imported: Array<Record<string, string>> = Array.isArray(parsed)
+          ? parsed
+          : Array.isArray(parsed.passwords)
+          ? parsed.passwords
+          : [];
+
+        if (imported.length === 0) {
+          toast.error("Nessuna password trovata nel file");
+          return;
+        }
+
         let count = 0;
         for (const item of imported) {
+          // Support both field naming conventions
+          const siteName = item.site_name || item.title || "";
+          const username = item.username || "";
+          const passwordVal = item.password_encrypted || item.password || "";
+
+          if (!siteName || !passwordVal) continue;
+
           const { error } = await supabase.from("passwords").insert({
-            site_name: item.site_name,
-            username: item.username,
-            password_encrypted: item.password_encrypted,
+            site_name: siteName,
+            username: username,
+            password_encrypted: passwordVal,
             url: item.url || null,
             notes: item.notes || null,
             category: item.category || "web",
