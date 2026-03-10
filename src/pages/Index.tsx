@@ -91,14 +91,25 @@ const Index = () => {
     setDialogOpen(true);
   };
 
-  // Backup: export as JSON
+  // Backup: export as JSON (compatible with original format)
   const handleBackup = () => {
-    const data = JSON.stringify(passwords, null, 2);
-    const blob = new Blob([data], { type: "application/json" });
+    const exportData = {
+      exported_at: new Date().toISOString(),
+      total: passwords.length,
+      passwords: passwords.map((p) => ({
+        title: p.site_name,
+        username: p.username,
+        password: p.password_encrypted,
+        url: p.url || "",
+        category: p.category,
+        notes: p.notes || "",
+      })),
+    };
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `password-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `backup_password_${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
     toast.success("Backup scaricato");
@@ -128,8 +139,8 @@ const Index = () => {
         }
 
         let count = 0;
+        let errors = 0;
         for (const item of imported) {
-          // Support both field naming conventions
           const siteName = item.site_name || item.title || "";
           const username = item.username || "";
           const passwordVal = item.password_encrypted || item.password || "";
@@ -146,11 +157,21 @@ const Index = () => {
             extra_info: item.extra_info || null,
             user_id: user!.id,
           });
-          if (!error) count++;
+          if (error) {
+            console.error("Errore importazione:", siteName, error.message);
+            errors++;
+          } else {
+            count++;
+          }
         }
-        toast.success(`${count} password importate`);
+        if (errors > 0) {
+          toast.warning(`${count} importate, ${errors} errori`);
+        } else {
+          toast.success(`${count} password importate`);
+        }
         fetchPasswords();
-      } catch {
+      } catch (err) {
+        console.error("Errore parsing file:", err);
         toast.error("File non valido");
       }
     };
