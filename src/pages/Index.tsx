@@ -6,6 +6,7 @@ import { PasswordDialog } from "@/components/PasswordDialog";
 import { PasswordRow } from "@/components/PasswordRow";
 import { toast } from "sonner";
 import { Plus, Search, LogOut, Shield, Key } from "lucide-react";
+import { InstallPWA } from "@/components/InstallPWA";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Password = Tables<"passwords">;
@@ -109,6 +110,7 @@ const Index = () => {
           </div>
 
           <div className="flex items-center gap-3">
+            <InstallPWA />
             <span className="text-xs text-slate-500 hidden sm:block">{user?.email}</span>
             <button
               onClick={signOut}
