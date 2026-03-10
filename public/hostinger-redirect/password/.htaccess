@@ -1,0 +1,2 @@
+RewriteEngine On
+RewriteRule ^(.*)$ https://import-spark-flow.lovable.app [R=301,L]
