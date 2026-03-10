@@ -1,21 +1,9 @@
 import { useState, useEffect } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import type { Tables } from "@/integrations/supabase/types";
-
-type Password = Tables<"passwords">;
+import { X } from "lucide-react";
 
 interface PasswordDialogProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onClose: () => void;
   onSave: (data: {
     site_name: string;
     username: string;
@@ -23,12 +11,18 @@ interface PasswordDialogProps {
     url?: string;
     notes?: string;
   }) => void;
-  editingPassword?: Password | null;
+  editingPassword?: {
+    site_name: string;
+    username: string;
+    password_encrypted: string;
+    url: string | null;
+    notes: string | null;
+  } | null;
 }
 
 export const PasswordDialog = ({
   open,
-  onOpenChange,
+  onClose,
   onSave,
   editingPassword,
 }: PasswordDialogProps) => {
@@ -63,81 +57,105 @@ export const PasswordDialog = ({
       url: url || undefined,
       notes: notes || undefined,
     });
-    onOpenChange(false);
+    onClose();
   };
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="border-2 border-border bg-card p-0 max-w-md">
-        <DialogHeader className="bg-secondary p-5">
-          <DialogTitle className="font-mono text-sm uppercase tracking-wider text-secondary-foreground">
-            {editingPassword ? "MODIFICA PASSWORD" : "NUOVA PASSWORD"}
-          </DialogTitle>
-        </DialogHeader>
+  if (!open) return null;
 
-        <form onSubmit={handleSubmit} className="p-5 space-y-4">
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+
+      {/* Dialog */}
+      <div className="relative w-full max-w-md bg-white/[0.06] backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl animate-in fade-in zoom-in-95 duration-200">
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 pb-0">
+          <h2 className="text-lg font-semibold text-slate-100">
+            {editingPassword ? "Modifica Password" : "Nuova Password"}
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-slate-500 hover:text-slate-300 transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="space-y-1.5">
-            <Label className="font-mono text-xs uppercase tracking-wider">Sito</Label>
-            <Input
+            <label className="font-medium text-xs uppercase tracking-wider text-slate-400">
+              Nome Sito
+            </label>
+            <input
               value={siteName}
               onChange={(e) => setSiteName(e.target.value)}
-              className="font-mono text-sm border-2 border-border focus:border-primary"
+              className="flex w-full rounded-md border px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-500 bg-white/[0.05] border-white/10 text-slate-100 placeholder:text-slate-500 h-11"
               placeholder="es. GitHub"
               required
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label className="font-mono text-xs uppercase tracking-wider">Username / Email</Label>
-            <Input
+            <label className="font-medium text-xs uppercase tracking-wider text-slate-400">
+              Username / Email
+            </label>
+            <input
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="font-mono text-sm border-2 border-border focus:border-primary"
+              className="flex w-full rounded-md border px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-500 bg-white/[0.05] border-white/10 text-slate-100 placeholder:text-slate-500 h-11"
               placeholder="utente@email.com"
               required
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label className="font-mono text-xs uppercase tracking-wider">Password</Label>
-            <Input
+            <label className="font-medium text-xs uppercase tracking-wider text-slate-400">
+              Password
+            </label>
+            <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="font-mono text-sm border-2 border-border focus:border-primary"
+              className="flex w-full rounded-md border px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-500 bg-white/[0.05] border-white/10 text-slate-100 placeholder:text-slate-500 h-11"
               placeholder="••••••••"
               required
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label className="font-mono text-xs uppercase tracking-wider">URL</Label>
-            <Input
+            <label className="font-medium text-xs uppercase tracking-wider text-slate-400">
+              URL
+            </label>
+            <input
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              className="font-mono text-sm border-2 border-border focus:border-primary"
+              className="flex w-full rounded-md border px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-500 bg-white/[0.05] border-white/10 text-slate-100 placeholder:text-slate-500 h-11"
               placeholder="https://github.com"
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label className="font-mono text-xs uppercase tracking-wider">Note</Label>
-            <Textarea
+            <label className="font-medium text-xs uppercase tracking-wider text-slate-400">
+              Note
+            </label>
+            <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="font-mono text-sm border-2 border-border focus:border-primary resize-none"
+              className="flex w-full rounded-md border px-3 py-2 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-500 bg-white/[0.05] border-white/10 text-slate-100 placeholder:text-slate-500 resize-none"
               rows={2}
+              placeholder="Note opzionali..."
             />
           </div>
 
-          <Button
+          <button
             type="submit"
-            className="w-full font-mono text-sm uppercase tracking-wider bg-primary text-primary-foreground hover:bg-primary/90 h-10"
+            className="w-full h-11 rounded-md bg-gradient-to-r from-indigo-500 to-pink-500 hover:from-indigo-600 hover:to-pink-600 text-white font-semibold text-sm shadow-lg shadow-indigo-500/30 transition-all hover:-translate-y-0.5"
           >
-            {editingPassword ? "AGGIORNA" : "SALVA"}
-          </Button>
+            {editingPassword ? "Aggiorna" : "Salva"}
+          </button>
         </form>
-      </DialogContent>
-    </Dialog>
+      </div>
+    </div>
   );
 };
