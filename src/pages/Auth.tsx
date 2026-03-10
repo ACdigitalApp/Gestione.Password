@@ -3,13 +3,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
 import { toast } from "sonner";
-import { Eye, EyeOff, LogIn, UserPlus } from "lucide-react";
+import { Eye, EyeOff, LogIn, UserPlus, ArrowLeft } from "lucide-react";
 import { InstallPWA } from "@/components/InstallPWA";
 import padlockIcon from "@/assets/padlock-icon.png";
 
 const Auth = () => {
   const { session, loading } = useAuth();
-  const [isLogin, setIsLogin] = useState(true);
+  const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -29,9 +29,19 @@ const Auth = () => {
     e.preventDefault();
     setSubmitting(true);
 
-    if (isLogin) {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (mode === "forgot") {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
       if (error) toast.error(error.message);
+      else toast.success("Email di recupero inviata! Controlla la tua casella di posta.");
+      setSubmitting(false);
+      return;
+    }
+
+    if (mode === "login") {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) toast.error("Credenziali non valide. Registrati se non hai un account.");
     } else {
       const { error } = await supabase.auth.signUp({
         email,
@@ -39,11 +49,18 @@ const Auth = () => {
         options: { emailRedirectTo: window.location.origin },
       });
       if (error) toast.error(error.message);
-      else toast.success("Controlla la tua email per confermare la registrazione.");
+      else toast.success("Registrazione completata! Puoi accedere.");
     }
 
     setSubmitting(false);
   };
+
+  const title = mode === "login" ? "Accedi" : mode === "signup" ? "Registrati" : "Recupera Password";
+  const subtitle = mode === "login"
+    ? "Inserisci le tue credenziali per sbloccare il vault."
+    : mode === "signup"
+    ? "Crea un account per proteggere le tue password."
+    : "Inserisci la tua email per ricevere il link di recupero.";
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-[#090D0F]">
@@ -58,21 +75,13 @@ const Auth = () => {
         </div>
 
         {/* Title */}
-        <h1 className="text-2xl font-bold text-center text-slate-100 mb-2">
-          {isLogin ? "Accedi" : "Registrati"}
-        </h1>
-        <p className="text-sm text-slate-400 text-center mb-8">
-          {isLogin
-            ? "Inserisci le tue credenziali per sbloccare il vault."
-            : "Crea un account per proteggere le tue password."}
-        </p>
+        <h1 className="text-2xl font-bold text-center text-slate-100 mb-2">{title}</h1>
+        <p className="text-sm text-slate-400 text-center mb-8">{subtitle}</p>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <label className="font-medium text-xs uppercase tracking-wider text-slate-400">
-              Email
-            </label>
+            <label className="font-medium text-xs uppercase tracking-wider text-slate-400">Email</label>
             <input
               type="email"
               value={email}
@@ -83,70 +92,85 @@ const Auth = () => {
             />
           </div>
 
-          <div className="space-y-1.5">
-            <label className="font-medium text-xs uppercase tracking-wider text-slate-400">
-              Password
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="flex w-full rounded-md border px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-500 md:text-sm bg-white/[0.05] border-white/10 text-slate-100 placeholder:text-slate-500 h-12 pr-12"
-                placeholder="••••••••"
-                required
-                minLength={6}
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
-              >
-                {showPassword ? (
-                  <EyeOff className="w-5 h-5" />
-                ) : (
-                  <Eye className="w-5 h-5" />
-                )}
-              </button>
+          {mode !== "forgot" && (
+            <div className="space-y-1.5">
+              <label className="font-medium text-xs uppercase tracking-wider text-slate-400">Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="flex w-full rounded-md border px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-500 md:text-sm bg-white/[0.05] border-white/10 text-slate-100 placeholder:text-slate-500 h-12 pr-12"
+                  placeholder="••••••••"
+                  required
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           <button
             type="submit"
             disabled={submitting}
             className="inline-flex items-center justify-center gap-2 w-full h-12 rounded-md bg-gradient-to-r from-indigo-500 to-pink-500 hover:from-indigo-600 hover:to-pink-600 text-white font-semibold text-base shadow-lg shadow-indigo-500/30 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:pointer-events-none"
           >
-            {isLogin ? (
+            {mode === "login" && (
               <>
                 <LogIn className="w-5 h-5 mr-2" />
                 {submitting ? "Accesso..." : "Accedi"}
               </>
-            ) : (
+            )}
+            {mode === "signup" && (
               <>
                 <UserPlus className="w-5 h-5 mr-2" />
                 {submitting ? "Registrazione..." : "Registrati"}
               </>
             )}
+            {mode === "forgot" && (submitting ? "Invio..." : "Invia link di recupero")}
           </button>
         </form>
 
-        {/* Footer links */}
-        {isLogin && (
+        {/* Forgot password link */}
+        {mode === "login" && (
           <div className="mt-4 text-center">
-            <button className="text-slate-500 hover:text-slate-300 text-sm transition-colors">
+            <button
+              onClick={() => setMode("forgot")}
+              className="text-slate-500 hover:text-slate-300 text-sm transition-colors"
+            >
               Non ricordi la Password?
             </button>
           </div>
         )}
 
-        <div className="mt-4 text-center">
-          <button
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-indigo-400 hover:text-indigo-300 text-sm font-semibold transition-colors"
-          >
-            {isLogin ? "Prima volta? Registrati" : "Hai già un account? Accedi"}
-          </button>
-        </div>
+        {mode === "forgot" && (
+          <div className="mt-4 text-center">
+            <button
+              onClick={() => setMode("login")}
+              className="inline-flex items-center gap-1 text-indigo-400 hover:text-indigo-300 text-sm font-semibold transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Torna al login
+            </button>
+          </div>
+        )}
+
+        {mode !== "forgot" && (
+          <div className="mt-4 text-center">
+            <button
+              onClick={() => setMode(mode === "login" ? "signup" : "login")}
+              className="text-indigo-400 hover:text-indigo-300 text-sm font-semibold transition-colors"
+            >
+              {mode === "login" ? "Prima volta? Registrati" : "Hai già un account? Accedi"}
+            </button>
+          </div>
+        )}
 
         {/* Install PWA */}
         <div className="mt-4 text-center">
