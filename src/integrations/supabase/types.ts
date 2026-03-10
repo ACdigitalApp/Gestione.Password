@@ -16,7 +16,9 @@ export type Database = {
     Tables: {
       passwords: {
         Row: {
+          category: string
           created_at: string
+          extra_info: string | null
           id: string
           notes: string | null
           password_encrypted: string
@@ -27,7 +29,9 @@ export type Database = {
           username: string
         }
         Insert: {
+          category?: string
           created_at?: string
+          extra_info?: string | null
           id?: string
           notes?: string | null
           password_encrypted: string
@@ -38,7 +42,9 @@ export type Database = {
           username: string
         }
         Update: {
+          category?: string
           created_at?: string
+          extra_info?: string | null
           id?: string
           notes?: string | null
           password_encrypted?: string
