@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Download, X, Share, Plus as PlusIcon } from "lucide-react";
+import { toast } from "sonner";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
