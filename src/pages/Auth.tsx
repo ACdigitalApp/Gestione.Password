@@ -119,7 +119,7 @@ const Auth = () => {
           <button
             type="submit"
             disabled={submitting}
-            className="inline-flex items-center justify-center gap-2 w-full h-12 rounded-md bg-gradient-to-r from-indigo-500 to-pink-500 hover:from-indigo-600 hover:to-pink-600 text-white font-semibold text-base shadow-lg shadow-indigo-500/30 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:pointer-events-none"
+            className="inline-flex items-center justify-center gap-2 w-full h-12 rounded-md bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-base shadow-lg shadow-primary/30 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:pointer-events-none"
           >
             {mode === "login" && (
               <>
