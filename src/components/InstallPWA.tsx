@@ -60,6 +60,7 @@ export const InstallPWA = () => {
           Scarica App
         </button>
         <span className="text-[10px] italic text-muted-foreground">by AC Digital App</span>
+        <VisitCounter />
       </div>
 
       {/* iOS Guide Modal */}
