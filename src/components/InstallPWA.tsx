@@ -50,13 +50,16 @@ export const InstallPWA = () => {
 
   return (
     <>
-      <button
-        onClick={handleInstall}
-        className="inline-flex items-center gap-1.5 h-8 rounded-md px-3 text-xs text-primary hover:text-primary/80 hover:bg-primary/10 font-medium transition-colors"
-      >
-        <Download className="w-4 h-4 mr-1.5" />
-        Scarica App
-      </button>
+      <div className="flex flex-col items-center">
+        <button
+          onClick={handleInstall}
+          className="inline-flex items-center gap-1.5 h-8 rounded-md px-3 text-xs text-primary hover:text-primary/80 hover:bg-primary/10 font-medium transition-colors"
+        >
+          <Download className="w-4 h-4 mr-1.5" />
+          Scarica App
+        </button>
+        <span className="text-[10px] italic text-muted-foreground">by AC Digital App</span>
+      </div>
 
       {/* iOS Guide Modal */}
       {showIOSGuide && (
