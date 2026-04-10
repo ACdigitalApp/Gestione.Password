@@ -17,8 +17,8 @@ const Auth = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#090D0F]">
-        <p className="text-slate-400 text-sm">Caricamento...</p>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <p className="text-muted-foreground text-sm">Caricamento...</p>
       </div>
     );
   }
@@ -63,8 +63,8 @@ const Auth = () => {
     : "Inserisci la tua email per ricevere il link di recupero.";
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-[#090D0F]">
-      <div className="w-full max-w-[420px] bg-white/[0.04] backdrop-blur-2xl border border-white/10 rounded-3xl p-12 shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="min-h-screen flex items-center justify-center p-6 bg-background">
+      <div className="w-full max-w-[420px] bg-card backdrop-blur-2xl border border-border rounded-3xl p-12 shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-500">
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <img
@@ -75,18 +75,18 @@ const Auth = () => {
         </div>
 
         {/* Title */}
-        <h1 className="text-2xl font-bold text-center text-slate-100 mb-2">{title}</h1>
-        <p className="text-sm text-slate-400 text-center mb-8">{subtitle}</p>
+        <h1 className="text-2xl font-bold text-center text-foreground mb-2">{title}</h1>
+        <p className="text-sm text-muted-foreground text-center mb-8">{subtitle}</p>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <label className="font-medium text-xs uppercase tracking-wider text-slate-400">Email</label>
+            <label className="font-medium text-xs uppercase tracking-wider text-muted-foreground">Email</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="flex w-full rounded-md border px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-500 md:text-sm bg-white/[0.05] border-white/10 text-slate-100 placeholder:text-slate-500 h-12"
+              className="flex w-full rounded-md border px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary md:text-sm bg-secondary border-border text-foreground placeholder:text-muted-foreground h-12"
               placeholder="tua@email.com"
               required
             />
@@ -94,13 +94,13 @@ const Auth = () => {
 
           {mode !== "forgot" && (
             <div className="space-y-1.5">
-              <label className="font-medium text-xs uppercase tracking-wider text-slate-400">Password</label>
+              <label className="font-medium text-xs uppercase tracking-wider text-muted-foreground">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="flex w-full rounded-md border px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-indigo-500 md:text-sm bg-white/[0.05] border-white/10 text-slate-100 placeholder:text-slate-500 h-12 pr-12"
+                  className="flex w-full rounded-md border px-3 py-1 text-base shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary md:text-sm bg-secondary border-border text-foreground placeholder:text-muted-foreground h-12 pr-12"
                   placeholder="••••••••"
                   required
                   minLength={6}
@@ -108,7 +108,7 @@ const Auth = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -142,7 +142,7 @@ const Auth = () => {
           <div className="mt-4 text-center">
             <button
               onClick={() => setMode("forgot")}
-              className="text-slate-500 hover:text-slate-300 text-sm transition-colors"
+              className="text-muted-foreground hover:text-foreground text-sm transition-colors"
             >
               Non ricordi la Password?
             </button>
@@ -153,7 +153,7 @@ const Auth = () => {
           <div className="mt-4 text-center">
             <button
               onClick={() => setMode("login")}
-              className="inline-flex items-center gap-1 text-indigo-400 hover:text-indigo-300 text-sm font-semibold transition-colors"
+              className="inline-flex items-center gap-1 text-primary hover:text-primary/80 text-sm font-semibold transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Torna al login
@@ -165,7 +165,7 @@ const Auth = () => {
           <div className="mt-4 text-center">
             <button
               onClick={() => setMode(mode === "login" ? "signup" : "login")}
-              className="text-indigo-400 hover:text-indigo-300 text-sm font-semibold transition-colors"
+              className="text-primary hover:text-primary/80 text-sm font-semibold transition-colors"
             >
               {mode === "login" ? "Prima volta? Registrati" : "Hai già un account? Accedi"}
             </button>
