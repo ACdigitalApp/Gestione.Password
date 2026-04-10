@@ -14,21 +14,20 @@ export const VisitCounter = () => {
       const shouldIncrement = !lastCounted || now - Number(lastCounted) > ONE_DAY_MS;
 
       if (shouldIncrement) {
-        const { data } = await supabase.rpc("increment_visits");
-        if (data != null) {
-          setCount(Number(data));
+        const { data: rpcData } = await supabase.rpc("increment_visits");
+        if (rpcData != null) {
+          setCount(Number(rpcData));
           localStorage.setItem(STORAGE_KEY, String(now));
           return;
         }
       }
 
-      // Just fetch current count
-      const { data } = await supabase
+      const { data: statsData } = await supabase
         .from("site_stats")
         .select("total_visits")
         .eq("id", "global")
         .single();
-      if (data) setCount(data.total_visits);
+      if (statsData) setCount(statsData.total_visits);
     };
     run();
   }, []);
