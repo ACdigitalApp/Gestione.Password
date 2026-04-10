@@ -246,7 +246,7 @@ const Index = () => {
             {/* Aggiungi */}
             <button
               onClick={() => { setEditingPassword(null); setDialogOpen(true); }}
-              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-emerald-500/20 text-emerald-600 hover:bg-emerald-500/30 text-xs font-semibold transition-colors"
+              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg bg-primary/20 text-primary hover:bg-primary/30 text-xs font-semibold transition-colors"
             >
               <Plus className="w-3.5 h-3.5" />
               Aggiungi
