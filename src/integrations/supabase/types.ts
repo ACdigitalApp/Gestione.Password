@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_revenues: {
+        Row: {
+          amount: number
+          app_key: string
+          app_name: string
+          currency: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          app_key: string
+          app_name: string
+          currency?: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          app_key?: string
+          app_name?: string
+          currency?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       passwords: {
         Row: {
           category: string
@@ -56,6 +83,48 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          last_sign_in_at: string | null
+          phone: string | null
+          plan: string
+          status: string
+          updated_at: string
+          user_id: string
+          whatsapp: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          last_sign_in_at?: string | null
+          phone?: string | null
+          plan?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+          whatsapp?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          last_sign_in_at?: string | null
+          phone?: string | null
+          plan?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
       site_stats: {
         Row: {
           id: string
@@ -71,15 +140,43 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       increment_visits: { Args: never; Returns: number }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -206,6 +303,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
