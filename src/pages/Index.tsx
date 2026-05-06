@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Navigate } from "react-router-dom";
+import { Navigate, Link } from "react-router-dom";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { supabase } from "@/integrations/supabase/client";
 import { PasswordDialog } from "@/components/PasswordDialog";
 import { PasswordRow } from "@/components/PasswordRow";
@@ -30,6 +31,7 @@ type SortOption = "a-z" | "z-a" | "recent";
 
 const Index = () => {
   const { session, user, loading, signOut } = useAuth();
+  const { isAdmin } = useIsAdmin();
   const [passwords, setPasswords] = useState<Password[]>([]);
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -287,14 +289,17 @@ const Index = () => {
               <span className="hidden md:inline">Stampa</span>
             </button>
 
-            {/* Utenti */}
-            <button
-              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted text-xs font-medium transition-colors"
-              title="Utenti"
-            >
-              <Users className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">Utenti</span>
-            </button>
+            {/* Admin */}
+            {isAdmin && (
+              <Link
+                to="/admin/users"
+                className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted text-xs font-medium transition-colors"
+                title="Admin"
+              >
+                <Users className="w-3.5 h-3.5" />
+                <span className="hidden md:inline">Admin</span>
+              </Link>
+            )}
 
             {/* User email */}
             <span className="text-xs text-muted-foreground px-2 hidden lg:block">{user?.email}</span>
