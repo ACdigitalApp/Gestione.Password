@@ -76,7 +76,7 @@ export async function decryptPassword(payload: string, key: CryptoKey): Promise<
   const env = JSON.parse(payload) as EncryptedEnvelope;
   const iv = b64decode(env.iv);
   const ct = b64decode(env.ciphertext);
-  const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv: iv as BufferSource }, key, ct);
+  const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv: iv as BufferSource }, key, ct as BufferSource);
   return dec.decode(plain);
 }
 
