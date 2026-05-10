@@ -120,6 +120,7 @@ const AdminUsers = () => {
         {/* Incassi */}
         <div className="bg-card rounded-xl border border-border/40 shadow-sm p-5">
           <h3 className="text-base font-semibold text-foreground mb-4">Incassi Tutte le App</h3>
+          <p className="text-xs text-muted-foreground mb-4">Versione incassi: AC6</p>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {revenues.map((r) => (
               <div key={r.app_key} className="rounded-lg border border-border/40 p-3 flex flex-col gap-1">
