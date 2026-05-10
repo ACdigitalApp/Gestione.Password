@@ -374,9 +374,19 @@ const Index = () => {
             {/* User email */}
             <span className="text-xs text-muted-foreground px-2 hidden lg:block">{user?.email}</span>
 
+            {/* Blocca Vault */}
+            <button
+              onClick={handleLockVault}
+              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted text-xs font-medium transition-colors"
+              title="Blocca Vault"
+            >
+              <Key className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Blocca</span>
+            </button>
+
             {/* Esci */}
             <button
-              onClick={signOut}
+              onClick={handleSignOut}
               className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted text-xs font-medium transition-colors"
               title="Esci"
             >
