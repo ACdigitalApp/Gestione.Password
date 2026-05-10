@@ -293,6 +293,16 @@ const Index = () => {
   }
 
   if (!session) return <Navigate to="/auth" replace />;
+  if (!isUnlocked) return <UnlockVault />;
+
+  const handleSignOut = async () => {
+    lock();
+    await signOut();
+  };
+
+  const handleLockVault = () => {
+    lock();
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
