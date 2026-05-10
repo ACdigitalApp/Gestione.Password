@@ -2,6 +2,9 @@ import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate, Link } from "react-router-dom";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useVaultCrypto } from "@/contexts/VaultCryptoContext";
+import { encryptPassword, decryptPassword, isEncryptedPayload } from "@/lib/vaultCrypto";
+import { UnlockVault } from "@/components/UnlockVault";
 import { supabase } from "@/integrations/supabase/client";
 import { PasswordDialog } from "@/components/PasswordDialog";
 import { PasswordRow } from "@/components/PasswordRow";
@@ -32,6 +35,7 @@ type SortOption = "a-z" | "z-a" | "recent";
 const Index = () => {
   const { session, user, loading, signOut } = useAuth();
   const { isAdmin } = useIsAdmin();
+  const { isUnlocked, key, lock } = useVaultCrypto();
   const [passwords, setPasswords] = useState<Password[]>([]);
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -41,19 +45,63 @@ const Index = () => {
   const [sortBy, setSortBy] = useState<SortOption>("a-z");
 
   useEffect(() => {
-    if (user) fetchPasswords();
-  }, [user]);
+    if (user && isUnlocked && key) fetchPasswords();
+    if (!isUnlocked) setPasswords([]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, isUnlocked]);
 
   const fetchPasswords = async () => {
+    if (!key || !user) return;
     setFetching(true);
     const { data, error } = await supabase
       .from("passwords")
       .select("*")
       .order("site_name", { ascending: true });
 
-    if (error) toast.error(error.message);
-    else setPasswords(data || []);
+    if (error) {
+      toast.error(error.message);
+      setFetching(false);
+      return;
+    }
+
+    const rows = data ?? [];
+    const decrypted: Password[] = [];
+    const legacyToMigrate: Password[] = [];
+
+    for (const row of rows) {
+      if (isEncryptedPayload(row.password_encrypted)) {
+        try {
+          const plain = await decryptPassword(row.password_encrypted, key);
+          decrypted.push({ ...row, password_encrypted: plain });
+        } catch {
+          decrypted.push({ ...row, password_encrypted: "" });
+        }
+      } else {
+        // Legacy plain-text record belonging to this user.
+        decrypted.push({ ...row });
+        legacyToMigrate.push(row);
+      }
+    }
+
+    setPasswords(decrypted);
     setFetching(false);
+
+    if (legacyToMigrate.length > 0) {
+      let migrated = 0;
+      for (const row of legacyToMigrate) {
+        try {
+          const envelope = await encryptPassword(row.password_encrypted, key);
+          const { error: upErr } = await supabase
+            .from("passwords")
+            .update({ password_encrypted: envelope })
+            .eq("id", row.id);
+          if (!upErr) migrated++;
+        } catch {
+          // leave record intact on failure
+        }
+      }
+      if (migrated > 0) toast.success("Vault aggiornato alla protezione avanzata.");
+    }
   };
 
   const handleSave = async (data: {
@@ -65,17 +113,23 @@ const Index = () => {
     category: string;
     extra_info?: string;
   }) => {
+    if (!key || !user) {
+      toast.error("Vault bloccato");
+      return;
+    }
+    const envelope = await encryptPassword(data.password_encrypted, key);
+    const payload = { ...data, password_encrypted: envelope };
     if (editingPassword) {
       const { error } = await supabase
         .from("passwords")
-        .update(data)
+        .update(payload)
         .eq("id", editingPassword.id);
       if (error) toast.error(error.message);
       else { toast.success("Password aggiornata"); fetchPasswords(); }
     } else {
       const { error } = await supabase
         .from("passwords")
-        .insert({ ...data, user_id: user!.id });
+        .insert({ ...payload, user_id: user.id });
       if (error) toast.error(error.message);
       else { toast.success("Password salvata"); fetchPasswords(); }
     }
@@ -149,10 +203,16 @@ const Index = () => {
 
           if (!siteName || !passwordVal) continue;
 
+          if (!key) {
+            toast.error("Vault bloccato");
+            errors++;
+            continue;
+          }
+          const envelope = await encryptPassword(passwordVal, key);
           const { error } = await supabase.from("passwords").insert({
             site_name: siteName,
             username: username,
-            password_encrypted: passwordVal,
+            password_encrypted: envelope,
             url: item.url || null,
             notes: item.notes || null,
             category: item.category || "web",
@@ -233,6 +293,16 @@ const Index = () => {
   }
 
   if (!session) return <Navigate to="/auth" replace />;
+  if (!isUnlocked) return <UnlockVault />;
+
+  const handleSignOut = async () => {
+    lock();
+    await signOut();
+  };
+
+  const handleLockVault = () => {
+    lock();
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -304,9 +374,19 @@ const Index = () => {
             {/* User email */}
             <span className="text-xs text-muted-foreground px-2 hidden lg:block">{user?.email}</span>
 
+            {/* Blocca Vault */}
+            <button
+              onClick={handleLockVault}
+              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted text-xs font-medium transition-colors"
+              title="Blocca Vault"
+            >
+              <Key className="w-3.5 h-3.5" />
+              <span className="hidden md:inline">Blocca</span>
+            </button>
+
             {/* Esci */}
             <button
-              onClick={signOut}
+              onClick={handleSignOut}
               className="inline-flex items-center gap-1.5 h-8 px-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted text-xs font-medium transition-colors"
               title="Esci"
             >
