@@ -43,7 +43,7 @@ export async function deriveVaultKey(masterKey: string, saltB64: string): Promis
   return crypto.subtle.deriveKey(
     {
       name: "PBKDF2",
-      salt,
+      salt: salt as BufferSource,
       iterations: PBKDF2_ITERATIONS,
       hash: "SHA-256",
     },
@@ -57,9 +57,9 @@ export async function deriveVaultKey(masterKey: string, saltB64: string): Promis
 export async function encryptPassword(plain: string, key: CryptoKey): Promise<string> {
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const ciphertext = await crypto.subtle.encrypt(
-    { name: "AES-GCM", iv },
+    { name: "AES-GCM", iv: iv as BufferSource },
     key,
-    enc.encode(plain)
+    enc.encode(plain) as BufferSource
   );
   const env: EncryptedEnvelope = {
     v: ENVELOPE_VERSION,
@@ -76,7 +76,7 @@ export async function decryptPassword(payload: string, key: CryptoKey): Promise<
   const env = JSON.parse(payload) as EncryptedEnvelope;
   const iv = b64decode(env.iv);
   const ct = b64decode(env.ciphertext);
-  const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, ct);
+  const plain = await crypto.subtle.decrypt({ name: "AES-GCM", iv: iv as BufferSource }, key, ct);
   return dec.decode(plain);
 }
 
