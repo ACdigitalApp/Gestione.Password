@@ -203,10 +203,16 @@ const Index = () => {
 
           if (!siteName || !passwordVal) continue;
 
+          if (!key) {
+            toast.error("Vault bloccato");
+            errors++;
+            continue;
+          }
+          const envelope = await encryptPassword(passwordVal, key);
           const { error } = await supabase.from("passwords").insert({
             site_name: siteName,
             username: username,
-            password_encrypted: passwordVal,
+            password_encrypted: envelope,
             url: item.url || null,
             notes: item.notes || null,
             category: item.category || "web",
