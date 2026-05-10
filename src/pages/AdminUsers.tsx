@@ -25,6 +25,15 @@ type AdminUser = {
 
 type Revenue = { app_key: string; app_name: string; amount: number; currency: string };
 
+const REQUIRED_REVENUE_APPS: { app_key: string; app_name: string }[] = [
+  { app_key: "gestione-scadenze", app_name: "Gestione Scadenze" },
+  { app_key: "gestione-password", app_name: "Gestione Password" },
+  { app_key: "librifree", app_name: "LibriFree" },
+  { app_key: "speak-translate", app_name: "Speak & Translate Live" },
+  { app_key: "djsengine", app_name: "DJSEngine" },
+  { app_key: "rosario-settimanale", app_name: "Rosario Settimanale" },
+];
+
 const fmt = (d?: string | null) => (d ? new Date(d).toLocaleDateString("it-IT") : "—");
 
 const AdminUsers = () => {
@@ -43,7 +52,22 @@ const AdminUsers = () => {
       else setUsers((data as any)?.users ?? []);
 
       const { data: rev } = await supabase.from("app_revenues").select("*").order("app_name");
-      setRevenues((rev as Revenue[]) ?? []);
+      const dbRows = (rev as Revenue[]) ?? [];
+      console.log("APP_REVENUES_DB_KEYS", dbRows.map((r) => r.app_key));
+      console.log("APP_REVENUES_DB_NAMES", dbRows.map((r) => r.app_name));
+      const dbMap = new Map(dbRows.map((r) => [r.app_key, r]));
+      const merged: Revenue[] = REQUIRED_REVENUE_APPS.map((req) => {
+        const found = dbMap.get(req.app_key);
+        return {
+          app_key: req.app_key,
+          app_name: req.app_name,
+          amount: Number(found?.amount ?? 0),
+          currency: found?.currency ?? "EUR",
+        };
+      });
+      console.log("APP_REVENUES_RENDERED_KEYS", merged.map((r) => r.app_key));
+      console.log("APP_REVENUES_RENDERED_NAMES", merged.map((r) => r.app_name));
+      setRevenues(merged);
       setLoading(false);
     })();
   }, [isAdmin]);
