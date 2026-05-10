@@ -52,7 +52,22 @@ const AdminUsers = () => {
       else setUsers((data as any)?.users ?? []);
 
       const { data: rev } = await supabase.from("app_revenues").select("*").order("app_name");
-      setRevenues((rev as Revenue[]) ?? []);
+      const dbRows = (rev as Revenue[]) ?? [];
+      console.log("APP_REVENUES_DB_KEYS", dbRows.map((r) => r.app_key));
+      console.log("APP_REVENUES_DB_NAMES", dbRows.map((r) => r.app_name));
+      const dbMap = new Map(dbRows.map((r) => [r.app_key, r]));
+      const merged: Revenue[] = REQUIRED_REVENUE_APPS.map((req) => {
+        const found = dbMap.get(req.app_key);
+        return {
+          app_key: req.app_key,
+          app_name: req.app_name,
+          amount: Number(found?.amount ?? 0),
+          currency: found?.currency ?? "EUR",
+        };
+      });
+      console.log("APP_REVENUES_RENDERED_KEYS", merged.map((r) => r.app_key));
+      console.log("APP_REVENUES_RENDERED_NAMES", merged.map((r) => r.app_name));
+      setRevenues(merged);
       setLoading(false);
     })();
   }, [isAdmin]);
