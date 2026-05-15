@@ -23,7 +23,15 @@ type AdminUser = {
   last_sign_in_at: string | null;
 };
 
-type Revenue = { app_key: string; app_name: string; amount: number; currency: string };
+type Revenue = {
+  app_key: string;
+  app_name: string;
+  amount: number;
+  currency: string;
+  paying_users?: number;
+  total_visitors?: number;
+  visitors?: number;
+};
 
 const REQUIRED_REVENUE_APPS: { app_key: string; app_name: string }[] = [
   { app_key: "gestione-scadenze", app_name: "Gestione Scadenze" },
@@ -63,6 +71,8 @@ const AdminUsers = () => {
           app_name: req.app_name,
           amount: Number(found?.amount ?? 0),
           currency: found?.currency ?? "EUR",
+          paying_users: Number((found as any)?.paying_users ?? 0),
+          total_visitors: Number((found as any)?.total_visitors ?? (found as any)?.visitors ?? 0),
         };
       });
       console.log("APP_REVENUES_RENDERED_KEYS", merged.map((r) => r.app_key));
@@ -128,6 +138,12 @@ const AdminUsers = () => {
                 <span className="text-lg font-bold text-foreground">
                   € {Number(r.amount).toFixed(2)}
                 </span>
+                <span className="text-xs text-muted-foreground">
+                  {Number(r.paying_users ?? 0)} utenti paganti
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  Visitatori Totali: {Number(r.total_visitors ?? r.visitors ?? 0)}
+                </span>
               </div>
             ))}
           </div>
@@ -185,6 +201,9 @@ const AdminUsers = () => {
             </Table>
           </div>
         </div>
+      </div>
+      <div className="fixed bottom-2 right-2 text-[10px] text-muted-foreground opacity-60">
+        admin-ui-version: github-visitors-total-20260515
       </div>
     </div>
   );
